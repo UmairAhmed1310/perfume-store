@@ -28,8 +28,9 @@ export default function Footer() {
             </Link>
           </div>
 
-          {/* Social Icons (Static) */}
+          {/* Social Icons (Clean & Fixed) */}
           <div className="flex space-x-5 text-stone-400">
+            {/* Instagram */}
             <a href="#" className="hover:text-stone-900 transition-colors" aria-label="Instagram">
               <svg className="w-5 h-5 fill-none stroke-current stroke-[1.5]" viewBox="0 0 24 24">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
@@ -37,12 +38,14 @@ export default function Footer() {
                 <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
               </svg>
             </a>
+            
+            {/* Pinterest (Fixed Path) */}
             <a href="#" className="hover:text-stone-900 transition-colors" aria-label="Pinterest">
-              <svg className="w-5 h-5 fill-none stroke-current stroke-[1.5]" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.5 21c.5-2.5 1-4.5 1.5-6.5C9 13 8 11.5 8 9.5c0-2.5 2-4.5 4.5-4.5s4 1.5 4 4c0 2-1 3.5-1.5 4.5s0 2.5 1 2.5c2 0 4.5-3 4.5-7 0-4-3.5-6.5-7.5-6.5E-5 0-7.5 3-7.5 7.5 0 1.5.5 2.5 1 3.5l-.5 2" />
+              <svg className="w-5 h-5 fill-none stroke-current stroke-[1.5] stroke-linejoin-round stroke-linecap-round" viewBox="0 0 24 24">
+                <path d="M8 22c.5-2.5 1.5-4.5 2-6.5C9.5 14 8.5 12 8.5 10c0-3 2.5-5 5-5s4.5 2 4.5 4.5c0 3-1.5 5.5-3.5 5.5s-3-1.5-2.5-3.5c1-3.5 3-6 3-8 0-2-1-3.5-3-3.5-2.5 0-4.5 2.5-4.5 5.5 0 1.5.5 3.5 1.5 4l-1.5 6" />
               </svg>
             </a>
-          </div>
+          </div>    
 
         </div>
       </div>
