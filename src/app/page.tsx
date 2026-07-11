@@ -1,16 +1,15 @@
 import React from 'react';
 import Link from 'next/link';
 import { products } from '@/data/products';
+import ProductCard from '@/components/product/ProductCard';
 
 export default function HomePage() {
-  // Filter for featured products
   const featuredProducts = products.filter((product) => product.featured);
 
   return (
     <div className="pb-24">
       {/* --- HERO SECTION --- */}
       <section className="relative h-[80vh] flex items-center justify-center bg-stone-50 overflow-hidden">
-        {/* Subtle decorative layout background element */}
         <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#d6d3d1_1px,transparent_1px)] [background-size:16px_16px]" />
         
         <div className="relative max-w-4xl mx-auto px-4 text-center z-10 flex flex-col items-center">
@@ -43,36 +42,10 @@ export default function HomePage() {
           <div className="w-12 h-[1px] bg-stone-300 mx-auto mt-4" />
         </div>
 
-        {/* Responsive Editorial Product Grid */}
+        {/* Using the modular ProductCard component */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
           {featuredProducts.map((product) => (
-            <div key={product.id} className="group cursor-pointer flex flex-col">
-              
-              {/* Product Image Wrapper */}
-              <div className="aspect-[4/5] w-full overflow-hidden bg-stone-100 relative mb-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover object-center transform group-hover:scale-102 transition-transform duration-700 ease-out"
-                />
-                <div className="absolute inset-0 bg-stone-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-
-              {/* Product Info Metadata */}
-              <div className="flex flex-col flex-grow">
-                <p className="text-[10px] tracking-widest uppercase text-stone-400 font-medium mb-1">
-                  {product.brand} &middot; {product.scentFamily}
-                </p>
-                <h3 className="font-serif text-base tracking-wide text-stone-900 group-hover:underline decoration-stone-300 underline-offset-4">
-                  {product.name}
-                </h3>
-                <p className="mt-1 text-sm text-stone-600 font-light">
-                  ${product.price}
-                </p>
-              </div>
-              
-            </div>
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
