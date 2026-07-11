@@ -2,6 +2,8 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { products } from '@/data/products';
+import AddToCartButton from "@/components/product/AddToCartButton";
+
 
 type ProductDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -82,14 +84,10 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             <p>&bull; Hand-blended and poured sequentially in limited editions.</p>
           </div>
 
+          // Inside your ProductDetailPage return layout where the button used to be:
           {/* Call to action panel */}
           <div>
-            <button
-              type="button"
-              className="w-full bg-stone-900 hover:bg-stone-800 text-white text-xs font-medium tracking-[0.2em] uppercase py-5 transition-colors duration-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-stone-900 focus:ring-offset-2"
-            >
-              Add To Collection
-            </button>
+            <AddToCartButton product={product} />
           </div>
 
         </div>
