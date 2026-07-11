@@ -35,11 +35,12 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Cart Icon */}
+          {/* Cart Icon Wrapper */}
           <div className="flex items-center">
-            <button 
-              className="p-2 text-stone-700 hover:text-stone-900 transition-colors relative focus:outline-none"
-              aria-label="Shopping Cart"
+            <Link 
+              href="/cart"
+              className="p-2 text-stone-700 hover:text-stone-900 transition-colors relative focus:outline-none block"
+              aria-label="View Shopping Cart"
             >
               <svg 
                 className="w-5 h-5 stroke-[1.5]" 
@@ -60,7 +61,7 @@ export default function Navbar() {
                   {cartCount}
                 </span>
               )}
-            </button>
+            </Link>
           </div>
 
         </div>
