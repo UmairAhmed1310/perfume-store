@@ -117,10 +117,23 @@ export default function CartPage() {
               </div>
 
               {/* Total Row Summary calculation */}
-              <div className="col-span-1 sm:col-span-2 text-left sm:text-right text-sm font-medium text-stone-900">
-                <span className="sm:hidden text-xs text-stone-400 font-light mr-1">Total:</span>
-                ${item.product.price * item.quantity}
+              <div className="space-y-4 text-sm font-light tracking-wide text-stone-600">
+                <div className="flex justify-between pb-4 border-b border-stone-200/60">
+                  <span>Subtotal</span>
+                  <span className="font-medium text-stone-900">${cartTotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between pb-4 border-b border-stone-200/60">
+                  <span>Shipping</span>
+                  <span className="text-xs text-stone-400 font-medium tracking-normal uppercase">
+                    Complimentary
+                  </span>
+                </div>
+                <div className="flex justify-between text-base text-stone-900 pt-2 font-medium">
+                  <span>Estimated Total</span>
+                  <span>${cartTotal.toFixed(2)}</span>
+                </div>
               </div>
+
             </div>
           ))}
         </section>

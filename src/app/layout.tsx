@@ -16,8 +16,11 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Essence | Haute Parfumerie",
-  description: "Discover curated minimalist fragrances.",
+  title: {
+    default: "Essence | Haute Parfumerie",
+    template: "%s | Essence",
+  },
+  description: "Discover curated minimalist fragrances, hand-blended in small batches.",
 };
 
 export default function RootLayout({
@@ -31,7 +34,7 @@ export default function RootLayout({
         <CartProvider>
           <div className="flex flex-col min-h-screen">
             <Navbar />
-            <main className="flex-grow">
+            <main className="flex-grow pt-20">
               {children}
             </main>
             <Footer />

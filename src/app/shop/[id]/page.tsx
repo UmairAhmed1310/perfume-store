@@ -3,11 +3,25 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { products } from '@/data/products';
 import AddToCartButton from "@/components/product/AddToCartButton";
-
+import type { Metadata } from "next";
 
 type ProductDetailPageProps = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const product = products.find((p) => p.id === id);
+  
+  if (!product) {
+    return { title: "Product Not Found" };
+  }
+  
+  return {
+    title: product.name,
+    description: product.description,
+  };
+}
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
   // Await the route parameters promise safely
