@@ -74,7 +74,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
           {/* Pricing tier block */}
           <p className="mt-4 text-xl font-light text-stone-700 tracking-wide">
-            ${product.price}.00
+            ${product.price.toFixed(2)}
           </p>
 
           <div className="w-full h-[1px] bg-stone-100 my-8" />

@@ -7,7 +7,6 @@ import { useCart } from "@/context/CartContext";
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, cartTotal } = useCart();
 
-  // 1. Conditional Empty State Handling
   if (cartItems.length === 0) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center bg-white px-4 text-center">
@@ -36,10 +35,10 @@ export default function CartPage() {
         </h1>
       </header>
 
-      {/* Main Structural Layout (Split Grid on Desktop) */}
+      {/* Main Structural Layout */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 grid grid-cols-1 lg:grid-cols-12 gap-x-16 gap-y-12">
         
-        {/* Left Column: List of items (Spans 7 blocks) */}
+        {/* Left Column: List of items */}
         <section className="lg:col-span-7 space-y-8">
           <div className="hidden sm:grid grid-cols-12 text-[10px] tracking-widest uppercase text-stone-400 font-semibold pb-4 border-b border-stone-100">
             <div className="col-span-6">Product</div>
@@ -74,7 +73,7 @@ export default function CartPage() {
                     {item.product.name}
                   </Link>
                   <p className="text-xs text-stone-400 font-light mt-0.5 sm:hidden">
-                    ${item.product.price} each
+                    ${item.product.price.toFixed(2)} each
                   </p>
                   <button
                     type="button"
@@ -88,10 +87,10 @@ export default function CartPage() {
 
               {/* Price Per Unit (Desktop Only) */}
               <div className="hidden sm:block sm:col-span-2 text-center text-sm font-light text-stone-600">
-                ${item.product.price}
+                ${item.product.price.toFixed(2)}
               </div>
 
-              {/* Modular Counter Step Matrix */}
+              {/* Quantity Controls */}
               <div className="col-span-1 sm:col-span-2 flex justify-start sm:justify-center">
                 <div className="flex items-center border border-stone-200 px-2 py-1 bg-white">
                   <button
@@ -116,29 +115,16 @@ export default function CartPage() {
                 </div>
               </div>
 
-              {/* Total Row Summary calculation */}
-              <div className="space-y-4 text-sm font-light tracking-wide text-stone-600">
-                <div className="flex justify-between pb-4 border-b border-stone-200/60">
-                  <span>Subtotal</span>
-                  <span className="font-medium text-stone-900">${cartTotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between pb-4 border-b border-stone-200/60">
-                  <span>Shipping</span>
-                  <span className="text-xs text-stone-400 font-medium tracking-normal uppercase">
-                    Complimentary
-                  </span>
-                </div>
-                <div className="flex justify-between text-base text-stone-900 pt-2 font-medium">
-                  <span>Estimated Total</span>
-                  <span>${cartTotal.toFixed(2)}</span>
-                </div>
+              {/* Line Item Total */}
+              <div className="col-span-1 sm:col-span-2 text-left sm:text-right text-sm font-medium text-stone-900">
+                <span className="sm:hidden text-xs text-stone-400 font-light mr-1">Total:</span>
+                ${(item.product.price * item.quantity).toFixed(2)}
               </div>
-
             </div>
           ))}
         </section>
 
-        {/* Right Column: Order Analytical Summaries (Spans 5 blocks) */}
+        {/* Right Column: Summary Card */}
         <section className="lg:col-span-5 bg-stone-50 border border-stone-100 p-8 self-start sticky top-28">
           <h2 className="font-serif text-xl text-stone-900 tracking-wide mb-6">
             Summary
@@ -147,7 +133,7 @@ export default function CartPage() {
           <div className="space-y-4 text-sm font-light tracking-wide text-stone-600">
             <div className="flex justify-between pb-4 border-b border-stone-200/60">
               <span>Subtotal</span>
-              <span className="font-medium text-stone-900">${cartTotal}.00</span>
+              <span className="font-medium text-stone-900">${cartTotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between pb-4 border-b border-stone-200/60">
               <span>Shipping</span>
@@ -157,7 +143,7 @@ export default function CartPage() {
             </div>
             <div className="flex justify-between text-base text-stone-900 pt-2 font-medium">
               <span>Estimated Total</span>
-              <span>${cartTotal}.00</span>
+              <span>${cartTotal.toFixed(2)}</span>
             </div>
           </div>
 
