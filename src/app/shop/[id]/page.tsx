@@ -84,7 +84,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             <p>&bull; Hand-blended and poured sequentially in limited editions.</p>
           </div>
 
-          // Inside your ProductDetailPage return layout where the button used to be:
+          {/* Inside your ProductDetailPage return layout where the button used to be: */}
           {/* Call to action panel */}
           <div>
             <AddToCartButton product={product} />
