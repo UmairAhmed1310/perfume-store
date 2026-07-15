@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useSession, signOut } from 'next-auth/react';
 import { useCart } from '@/context/CartContext';
 
 export default function Navbar() {
+  const { data: session } = useSession();
   const { cartCount } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -62,8 +64,32 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Cart Icon Wrapper */}
-          <div className="flex items-center">
+          {/* Right Side: Auth + Cart */}
+          <div className="flex items-center space-x-4">
+            {/* Auth: Login / User + Logout */}
+            {session ? (
+              <div className="hidden md:flex items-center space-x-4">
+                <span className="text-sm font-light tracking-wide text-stone-600">
+                  {session.user?.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => signOut()}
+                  className="text-xs font-medium tracking-widest uppercase text-stone-400 hover:text-stone-900 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link 
+                href="/login"
+                className="hidden md:block text-sm font-medium tracking-wide text-stone-600 hover:text-stone-900 transition-colors"
+              >
+                Login
+              </Link>
+            )}
+
+            {/* Cart Icon */}
             <Link 
               href="/cart"
               className="p-2 text-stone-700 hover:text-stone-900 transition-colors relative focus:outline-none block"
@@ -96,6 +122,31 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+          {/* Mobile Auth Links */}
+          <div className="border-t border-stone-100 pt-3 mt-3">
+            {session ? (
+              <>
+                <span className="block px-3 py-2 text-sm font-light tracking-wide text-stone-500">
+                  Signed in as {session.user?.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => signOut()}
+                  className="block w-full text-left px-3 py-2 text-base font-light tracking-wide text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-all"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-2 text-base font-light tracking-wide text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-all"
+              >
+                Login
+              </Link>
+            )}
+          </div>
         </div>
       )}
     </nav>
