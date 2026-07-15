@@ -1,10 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
-import { products } from '@/data/products';
+import { prisma } from '@/prisma';
 import ProductCard from '@/components/product/ProductCard';
 
-export default function HomePage() {
-  const featuredProducts = products.filter((product) => product.featured);
+export default async function HomePage() {
+  const featuredProducts = await prisma.product.findMany({
+    where: { featured: true },
+  });
 
   return (
     <div className="pb-24">

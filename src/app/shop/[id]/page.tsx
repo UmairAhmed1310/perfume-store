@@ -1,7 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { products } from '@/data/products';
+import { prisma } from '@/prisma';
 import AddToCartButton from "@/components/product/AddToCartButton";
 import type { Metadata } from "next";
 
@@ -11,7 +11,7 @@ type ProductDetailPageProps = {
 
 export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
   const { id } = await params;
-  const product = products.find((p) => p.id === id);
+  const product = await prisma.product.findUnique({ where: { id } });
   
   if (!product) {
     return { title: "Product Not Found" };
@@ -27,8 +27,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   // Await the route parameters promise safely
   const { id } = await params;
   
-  // Look up the unique product configuration from data store
-  const product = products.find((p) => p.id === id);
+  // Look up the unique product from the database
+  const product = await prisma.product.findUnique({ where: { id } });
   
   // Direct to custom 404 page if someone looks up an invalid product ID
   if (!product) {
