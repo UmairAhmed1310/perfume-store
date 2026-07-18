@@ -1,5 +1,5 @@
 import React from 'react';
-import { prisma } from '@/prisma';
+import { prisma } from '@/lib/prisma';
 import ShopContent from '@/components/product/ShopContent';
 
 export default async function ShopPage() {

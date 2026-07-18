@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { prisma } from '@/prisma';
+import { prisma } from '@/lib/prisma';
 import ProductCard from '@/components/product/ProductCard';
 
 export default async function HomePage() {
