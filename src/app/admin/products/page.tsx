@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { deleteProduct } from "./actions";
+import DeleteButton from "./DeleteButton";
 
 export default async function AdminProductsPage() {
   const products = await prisma.product.findMany({
@@ -106,26 +106,10 @@ export default async function AdminProductsPage() {
                       >
                         Edit
                       </Link>
-                      <form
-                        action={deleteProduct}
-                        onSubmit={(e) => {
-                          if (
-                            !confirm(
-                              `Delete "${product.name}"? This cannot be undone.`
-                            )
-                          ) {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        <input type="hidden" name="id" value={product.id} />
-                        <button
-                          type="submit"
-                          className="text-xs font-medium tracking-wider uppercase text-red-500 hover:text-red-700 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </form>
+                      <DeleteButton
+                        productId={product.id}
+                        productName={product.name}
+                      />
                     </div>
                   </td>
                 </tr>
