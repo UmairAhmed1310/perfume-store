@@ -7,28 +7,30 @@ generator client {
    }
 
    model Product {
-     id          String   @id @default(cuid())
+     id          String      @id @default(cuid())
      name        String
      brand       String
      price       Float
      scentFamily String
      description String
      image       String
-     featured    Boolean  @default(false)
-     createdAt   DateTime @default(now())
+     featured    Boolean     @default(false)
+     createdAt   DateTime    @default(now())
+     cartItems   CartItem[]
    }
 
    model User {
-     id            String    @id @default(cuid())
+     id            String      @id @default(cuid())
      name          String?
-     email         String    @unique
-     password      String?   // hashed, only used for credentials login
-     role          String    @default("customer") // "customer" | "admin"
+     email         String      @unique
+     password      String?     // hashed, only used for credentials login
+     role          String      @default("customer") // "customer" | "admin"
      emailVerified DateTime?
      image         String?
      accounts      Account[]
      sessions      Session[]
-     createdAt     DateTime  @default(now())
+     cartItems     CartItem[]
+     createdAt     DateTime    @default(now())
    }
 
    model Account {
@@ -55,4 +57,16 @@ generator client {
      userId       String
      expires      DateTime
      user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+   }
+
+   model CartItem {
+     id        String   @id @default(cuid())
+     userId    String
+     productId String
+     quantity  Int      @default(1)
+     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+     product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+     createdAt DateTime @default(now())
+
+     @@unique([userId, productId])
    }
