@@ -1,10 +1,15 @@
 "use client";
 
-import React, { useActionState } from "react";
+import React, { useRef, useState } from "react";
+import { useActionState } from "react";
 import { type ProductState } from "./actions";
+import { uploadProductImage } from "./upload-action";
 
 type ProductFormProps = {
-  action: (prevState: ProductState, formData: FormData) => Promise<ProductState>;
+  action: (
+    prevState: ProductState,
+    formData: FormData
+  ) => Promise<ProductState>;
   product?: {
     id?: string;
     name: string;
@@ -18,7 +23,15 @@ type ProductFormProps = {
   submitLabel: string;
 };
 
-const scentFamilies = ["Woody", "Floral", "Citrus", "Amber", "Oriental", "Fresh", "Gourmand"];
+const scentFamilies = [
+  "Woody",
+  "Floral",
+  "Citrus",
+  "Amber",
+  "Oriental",
+  "Fresh",
+  "Gourmand",
+];
 
 export default function ProductForm({
   action,
@@ -30,8 +43,44 @@ export default function ProductForm({
     {}
   );
 
+  // Image upload state
+  const [imageUrl, setImageUrl] = useState<string>(product?.image ?? "");
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadError("");
+    setUploading(true);
+
+    const fd = new FormData();
+    fd.append("file", file);
+
+    const result = await uploadProductImage(fd);
+
+    setUploading(false);
+
+    if (result.error) {
+      setUploadError(result.error);
+      // Reset the file input so the user can try again
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    if (result.url) {
+      setImageUrl(result.url);
+    }
+  }
+
   return (
-    <form action={formAction} className="space-y-8 max-w-2xl">
+    <form
+      action={formAction}
+      className="space-y-8 max-w-2xl"
+      onSubmit={() => setUploadError("")}
+    >
       {product?.id && <input type="hidden" name="id" value={product.id} />}
 
       {/* Error message */}
@@ -143,31 +192,58 @@ export default function ProductForm({
         />
       </div>
 
-      {/* Image URL */}
+      {/* Image Upload */}
       <div>
-        <label
-          htmlFor="image"
-          className="block text-[10px] tracking-widest uppercase text-stone-500 font-medium mb-2"
-        >
-          Image URL
+        <label className="block text-[10px] tracking-widest uppercase text-stone-500 font-medium mb-2">
+          Product Image
         </label>
-        <input
-          type="url"
-          id="image"
-          name="image"
-          required
-          defaultValue={product?.image}
-          className="w-full bg-white border border-stone-200 text-stone-900 text-sm font-light tracking-wide px-4 py-3 focus:outline-none focus:border-stone-900 transition-all placeholder-stone-400"
-          placeholder="https://placehold.co/400x500/..."
-        />
-        {product?.image && (
-          <div className="mt-3">
+
+        {/* File picker */}
+        <div className="flex items-center gap-4">
+          <label
+            htmlFor="image-upload"
+            className={`cursor-pointer bg-white border border-stone-200 text-stone-600 text-xs font-medium tracking-widest uppercase px-6 py-3 hover:border-stone-900 hover:text-stone-900 transition-all ${
+              uploading ? "opacity-50 pointer-events-none" : ""
+            }`}
+          >
+            {uploading ? "Uploading..." : "Choose File"}
+          </label>
+          <input
+            ref={fileInputRef}
+            id="image-upload"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            disabled={uploading}
+            className="hidden"
+          />
+          {uploading && (
+            <span className="text-xs text-stone-400 tracking-wide animate-pulse">
+              Uploading image to Vercel Blob...
+            </span>
+          )}
+        </div>
+
+        {/* Upload error */}
+        {uploadError && (
+          <p className="mt-2 text-xs text-red-600 tracking-wide">{uploadError}</p>
+        )}
+
+        {/* Hidden field submits the URL to the main product save action */}
+        <input type="hidden" name="image" value={imageUrl} />
+
+        {/* Preview */}
+        {imageUrl && !uploading && (
+          <div className="mt-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={product.image}
-              alt="Current product image"
-              className="w-24 h-32 object-cover bg-stone-100 border border-stone-200"
+              src={imageUrl}
+              alt="Product preview"
+              className="w-32 h-44 object-cover bg-stone-100 border border-stone-200"
             />
+            <p className="mt-1 text-[10px] text-stone-400 tracking-wide break-all">
+              {imageUrl}
+            </p>
           </div>
         )}
       </div>
@@ -192,10 +268,10 @@ export default function ProductForm({
       {/* Submit */}
       <button
         type="submit"
-        disabled={pending}
+        disabled={pending || uploading}
         className="bg-stone-900 hover:bg-stone-800 disabled:bg-stone-400 text-white text-xs font-medium tracking-[0.15em] uppercase px-8 py-4 transition-colors duration-300"
       >
-        {pending ? "Saving..." : submitLabel}
+        {pending ? "Saving..." : uploading ? "Upload in progress..." : submitLabel}
       </button>
     </form>
   );
