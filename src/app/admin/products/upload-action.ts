@@ -24,8 +24,11 @@ export async function uploadProductImage(
   }
 
   const blob = await put(`products/${Date.now()}-${file.name}`, file, {
-    access: "public",
+    access: "private",
+    token: process.env.BLOB_READ_WRITE_TOKEN,
   });
 
-  return { url: blob.url };
+  // Return a proxy URL so the image can be displayed publicly via our API route
+  const proxyUrl = `/api/image/view?pathname=${encodeURIComponent(blob.pathname)}`;
+  return { url: proxyUrl };
 }
