@@ -5,7 +5,14 @@ import { Pool } from 'pg';
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 function createClient() {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error(
+      "DATABASE_URL is not set. Add it to Vercel dashboard → Settings → Environment Variables, " +
+      "or create a .env.local file for local development."
+    );
+  }
+  const pool = new Pool({ connectionString: url });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 }
