@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { type Product } from "@prisma/client";
+import { Product } from "@/data/products";
 import DeleteButton from "./DeleteButton";
 
 export default async function AdminProductsPage() {
