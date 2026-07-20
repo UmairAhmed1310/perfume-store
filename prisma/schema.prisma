@@ -30,6 +30,7 @@ generator client {
      accounts      Account[]
      sessions      Session[]
      cartItems     CartItem[]
+     orders        Order[]
      createdAt     DateTime    @default(now())
    }
 
@@ -69,4 +70,28 @@ generator client {
      createdAt DateTime @default(now())
 
      @@unique([userId, productId])
+   }
+
+   model Order {
+     id             String      @id @default(cuid())
+     userId         String?
+     guestEmail     String?
+     guestName      String?
+     status         String      @default("pending") // pending | paid | rejected | fulfilled
+     paymentMethod  String      // "jazzcash" | "easypaisa" | "stripe"
+     transactionRef String?     // customer-submitted TX ID for manual methods
+     total          Float
+     items          OrderItem[]
+     user           User?       @relation(fields: [userId], references: [id])
+     createdAt      DateTime    @default(now())
+   }
+
+   model OrderItem {
+     id        String  @id @default(cuid())
+     orderId   String
+     productId String
+     name      String  // snapshot — survives future edits/deletes to the product
+     price     Float   // snapshot
+     quantity  Int
+     order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
    }
