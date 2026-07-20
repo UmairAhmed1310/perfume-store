@@ -1,10 +1,11 @@
 import React from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { type Product } from "@prisma/client";
 import DeleteButton from "./DeleteButton";
 
 export default async function AdminProductsPage() {
-  const products = await prisma.product.findMany({
+  const products: Product[] = await prisma.product.findMany({
     orderBy: { createdAt: "desc" },
   });
 
