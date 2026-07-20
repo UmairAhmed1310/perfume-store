@@ -5,7 +5,6 @@ import React, {
   useContext,
   useState,
   useEffect,
-  useRef,
   useCallback,
 } from "react";
 import { useSession } from "next-auth/react";
@@ -36,6 +35,7 @@ type CartContextType = {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const LS_KEY = "cart";
+const LS_MERGED_KEY = "cart_merged"; // persists across remounts (page navigations)
 
 function readLocalCart(): CartItem[] {
   if (typeof window === "undefined") return [];
@@ -52,12 +52,22 @@ function writeLocalCart(items: CartItem[]) {
   localStorage.setItem(LS_KEY, JSON.stringify(items));
 }
 
+function isMerged(): boolean {
+  return localStorage.getItem(LS_MERGED_KEY) === "true";
+}
+
+function setMerged() {
+  localStorage.setItem(LS_MERGED_KEY, "true");
+}
+
+function clearMerged() {
+  localStorage.removeItem(LS_MERGED_KEY);
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const { data: session, status } = useSession();
-  const mergedRef = useRef(false);
-  const skipSyncRef = useRef(false); // prevents write→read loops
 
   // ---------------------------------------------------------------
   // 1. Hydrate from localStorage on mount
@@ -68,11 +78,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ---------------------------------------------------------------
-  // 2. Sync cartItems → localStorage (skip during merge load)
+  // 2. Sync cartItems → localStorage
   // ---------------------------------------------------------------
   useEffect(() => {
     if (!hydrated) return;
-    if (skipSyncRef.current) return;
     writeLocalCart(cartItems);
   }, [cartItems, hydrated]);
 
@@ -81,8 +90,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // ---------------------------------------------------------------
   useEffect(() => {
     if (status !== "authenticated" || !session?.user?.id) return;
-    if (mergedRef.current) return; // already merged this session
-    mergedRef.current = true;
+    if (isMerged()) return; // already merged — flag persists across remounts
+
+    // Set flag SYNCHRONOUSLY before any async work.
+    // In React 18 strict mode (dev), effects fire twice. If we set the
+    // flag inside the async function (after an await), the second
+    // invocation won't see it and will run a duplicate merge.
+    setMerged();
 
     const mergeAndLoad = async () => {
       const localItems = readLocalCart();
@@ -104,25 +118,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         quantity: row.quantity,
       }));
 
-      // Skip the localStorage sync for this setState so we don't
-      // overwrite the guest cart the user might still want on logout
-      skipSyncRef.current = true;
       setCartItems(merged);
-      // Allow sync on next tick
-      requestAnimationFrame(() => {
-        skipSyncRef.current = false;
-      });
+      // The sync useEffect will write merged result to localStorage,
+      // so logout will correctly show the merged total
     };
 
     mergeAndLoad();
-  }, [status, session]);
+  }, [status, session?.user?.id]);
 
   // ---------------------------------------------------------------
   // 4. On logout: reset merge flag, reload from localStorage
   // ---------------------------------------------------------------
   useEffect(() => {
     if (status !== "unauthenticated") return;
-    mergedRef.current = false;
+    clearMerged();
     setCartItems(readLocalCart());
   }, [status]);
 
