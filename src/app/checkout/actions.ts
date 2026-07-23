@@ -18,17 +18,19 @@ export async function placeOrder(
   const isLoggedIn = !!session?.user?.id;
 
   // --- Parse cart items from hidden field ---
+  // We ONLY trust productId and quantity from the client.
+  // Price and name come from the database — never from the browser.
   const cartJson = formData.get("cartItems") as string;
   if (!cartJson) return { error: "Cart is empty." };
 
-  let cartItems: { productId: string; name: string; price: number; quantity: number }[];
+  let cartInput: { productId: string; quantity: number }[];
   try {
-    cartItems = JSON.parse(cartJson);
+    cartInput = JSON.parse(cartJson);
   } catch {
     return { error: "Invalid cart data." };
   }
 
-  if (!Array.isArray(cartItems) || cartItems.length === 0) {
+  if (!Array.isArray(cartInput) || cartInput.length === 0) {
     return { error: "Cart is empty." };
   }
 
@@ -56,8 +58,28 @@ export async function placeOrder(
     }
   }
 
-  // --- Calculate total ---
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // --- Fetch real prices from DB (never trust client-submitted prices) ---
+  const productIds = cartInput.map((i) => i.productId);
+  const dbProducts = await prisma.product.findMany({
+    where: { id: { in: productIds } },
+  });
+
+  const orderItemsData = cartInput.map((item) => {
+    const product = dbProducts.find((p) => p.id === item.productId);
+    if (!product) {
+      throw new Error(`Product ${item.productId} no longer exists.`);
+    }
+    // Clamp quantity to sane range (1–20) to prevent abuse
+    const quantity = Math.max(1, Math.min(20, Math.floor(item.quantity)));
+    return {
+      productId: item.productId,
+      name: product.name,
+      price: product.price,
+      quantity,
+    };
+  });
+
+  const total = orderItemsData.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   // --- Create order in a transaction ---
   const order = await prisma.$transaction(async (tx) => {
@@ -70,7 +92,7 @@ export async function placeOrder(
         transactionRef,
         total,
         items: {
-          create: cartItems.map((item) => ({
+          create: orderItemsData.map((item) => ({
             productId: item.productId,
             name: item.name,
             price: item.price,

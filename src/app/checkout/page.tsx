@@ -41,12 +41,11 @@ export default function CheckoutPage() {
 
   const activeMethod = enabledMethods.find((m) => m.id === selectedMethod);
 
-  // Build hidden cart items JSON for the server action
+  // Build hidden cart items JSON for the server action.
+  // Only send productId + quantity — the server fetches price/name from the DB.
   const cartItemsJson = JSON.stringify(
     cartItems.map((item) => ({
       productId: item.product.id,
-      name: item.product.name,
-      price: item.product.price,
       quantity: item.quantity,
     }))
   );
